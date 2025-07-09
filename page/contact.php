@@ -34,13 +34,13 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
             <!-- Contact Details -->
             <div class="bg-white p-6 shadow-lg rounded-lg">
                 <h2 class="text-2xl font-semibold text-green-800">📍 Our Office</h2>
-                <p class="text-gray-600 mt-2">123 Poultry Farm Lane, Agriculture City, Nigeria</p>
+                <p class="text-gray-600 mt-2">Poultry Farm Lane, Agriculture City, Nigeria</p>
 
                 <h2 class="text-2xl font-semibold text-green-800 mt-4">📞 Call Us</h2>
                 <p class="text-gray-600 mt-2">+234 08110237625</p>
 
                 <h2 class="text-2xl font-semibold text-green-800 mt-4">📧 Email</h2>
-                <p class="text-gray-600 mt-2">adypoultryfarm@gmail.com</p>
+                <p class="text-gray-600 mt-2">rademu910@gmail.com</p>
 
                 <h2 class="text-2xl font-semibold text-green-800 mt-4">🕒 Working Hours</h2>
                 <p class="text-gray-600 mt-2">Monday - Friday: 9:00 AM - 5:00 PM</p>
@@ -76,16 +76,4 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
 
 
 
-<?php
-
-$hashedPassword = password_hash($password, PASSWORD_BCRYPT);
-
-$checkEmail = $conn->prepare("SELECT id FROM users WHERE email = ?");
-$checkEmail->bind_param("s", $email);
-$checkEmail->execute();
-$checkEmail->store_result();
-
-if ($checkEmail->num_rows > 0) {
-    die("<script>alert('Error: Email is already registered.'); window.history.back();</script>");
-}
-?>
+<

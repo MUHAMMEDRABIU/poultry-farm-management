@@ -145,6 +145,11 @@ $reports_result = $conn->query($reports_query);
                 <p class="text-gray-600 mt-4">No reports available.</p>
             <?php } ?>
         </div>
-    </div>
+    </div>\
+    <!-- Go Back Button (Bottom) -->
+    <div class="mt-6 text-center">
+        <a href="dashboard.php" class="inline-block bg-green-600 text-white px-4 py-2 rounded-md hover:bg-green-700">
+             Go Back to Dashboard
+        </a>
 </body>
 </html>

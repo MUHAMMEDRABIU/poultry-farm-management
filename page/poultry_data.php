@@ -1,6 +1,7 @@
 <?php
 session_start();
 include '../config.php'; // Database connection
+
 // Fetch poultry records from the database
 $sql = "SELECT * FROM poultry_records ORDER BY created_at DESC";
 $result = $conn->query($sql);
@@ -14,10 +15,12 @@ $result = $conn->query($sql);
     <script src="https://cdn.tailwindcss.com"></script>
 </head>
 <body class="bg-gray-100">
-        <!-- Poultry Data Table --> 
-    <div class="bg-white shadow-md rounded-lg p-4 w-full">    
-          <h2 class="text-3xl font-bold text-gray-800 mb-4 text-center">Poultry Data</h2>   
-    
+
+
+    <!-- Poultry Data Table -->
+    <div class="bg-white shadow-md rounded-lg p-4 w-full max-w-6xl mx-auto">
+        <h2 class="text-3xl font-bold text-gray-800 mb-4 text-center">Poultry Data</h2>
+
         <table class="border-collapse border border-gray-200 w-full text-center">
             <thead>
                 <tr class="bg-gray-100">
@@ -43,5 +46,13 @@ $result = $conn->query($sql);
             </tbody>
         </table>
     </div>
+
+    <!-- Go Back Button (Bottom) -->
+    <div class="mt-6 text-center">
+        <a href="dashboard.php" class="inline-block bg-green-600 text-white px-4 py-2 rounded-md hover:bg-green-700">
+             Go Back to Dashboard
+        </a>
+    </div>
+
 </body>
 </html>
