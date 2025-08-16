@@ -13,7 +13,6 @@ if ($_SERVER["REQUEST_METHOD"] == "POST" && isset($_POST['add_feeding_record']))
     $quantity = isset($_POST['quantity']) ? trim($_POST['quantity']) : '';
     $feeding_time = isset($_POST['feeding_time']) ? trim($_POST['feeding_time']) : '';
 
-    // Validate inputs
     if ($feed_type == '' || $quantity == '' || $feeding_time == '') {
         $_SESSION['error_message'] = "All fields are required!";
     } elseif (!is_numeric($quantity)) {
@@ -32,10 +31,6 @@ if ($_SERVER["REQUEST_METHOD"] == "POST" && isset($_POST['add_feeding_record']))
     header("Location: feeding_system.php");
     exit();
 }
-
-// Fetch Feeding Records
-$sql = "SELECT * FROM feeding_records ORDER BY feeding_time DESC";
-$result = $conn->query($sql);
 
 // Handle Feeding Schedule Submission
 if ($_SERVER["REQUEST_METHOD"] == "POST" && isset($_POST['set_feeding_schedule'])) {
@@ -85,133 +80,125 @@ if ($_SERVER["REQUEST_METHOD"] == "POST" && isset($_POST['set_feeding_schedule']
     header("Location: feeding_system.php");
     exit();
 }
-
 ?>
 
 <!DOCTYPE html>
 <html lang="en">
+
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Admin Feeding Management</title>
     <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://unpkg.com/phosphor-icons"></script>
 </head>
- <!-- Sidebar -->
- <div class="sidebar fixed top-0 left-0 h-full bg-gray-900 text-white w-64 p-4">
-        <button id="toggleSidebar" class="mb-4 text-white focus:outline-none">
+
+<body class="bg-gray-100">
+
+    <!-- Sidebar -->
+    <div id="sidebar" class="sidebar fixed top-0 left-0 h-full bg-gray-900 text-white w-64 p-4 transition-transform duration-300">
+        <button id="toggleSidebar" class="mb-4 text-white focus:outline-none block lg:hidden">
             <i class="ph ph-list text-2xl"></i>
         </button>
         <div class="logo text-center text-xl font-bold border-b border-gray-700 pb-2">
             Admin Panel
         </div>
         <nav class="mt-4">
-            <a href="admin_dashboard.php" class="flex items-center gap-2 px-4 py-3 hover:bg-gray-700">
-                <i class="ph ph-gauge"></i> <span>Dashboard</span>
-            </a>
-            <a href="poultry_data.php" class="flex items-center gap-2 px-4 py-3 hover:bg-gray-700">
-                <i class="ph ph-chart-line"></i> <span>poultry_data  Management</span>
-            </a>
-            <a href="reports.php" class="flex items-center gap-2 px-4 py-3 hover:bg-gray-700">
-                <i class="ph ph-chart-line"></i> <span>Report Management</span>
-            </a>
-            <a href="overview.php" class="flex items-center gap-2 px-4 py-3 hover:bg-gray-700">
-                <i class="ph ph-eye"></i> <span>Overview</span>
-            </a>
-            <a href="feeding_system.php" class="flex items-center gap-2 px-4 py-3 hover:bg-gray-700">
-                <i class="ph ph-fork-knife"></i> <span>Feeding System</span>
-            </a>
-            <a href="user_management.php" class="flex items-center gap-2 px-4 py-3 hover:bg-gray-700">
-                <i class="ph ph-users"></i> <span>User Management</span>
-            </a>
-            <a href="logout.php" class="flex items-center gap-2 px-4 py-3 text-red-400 hover:bg-red-600 hover:text-white">
-                <i class="ph ph-sign-out"></i> <span>Logout</span>
-            </a>
+            <a href="admin_dashboard.php" class="flex items-center gap-2 px-4 py-3 hover:bg-gray-700"><i class="ph ph-gauge"></i> <span>Dashboard</span></a>
+            <a href="poultry_data.php" class="flex items-center gap-2 px-4 py-3 hover:bg-gray-700"><i class="ph ph-chart-line"></i> <span>Poultry Data</span></a>
+            <a href="reports.php" class="flex items-center gap-2 px-4 py-3 hover:bg-gray-700"><i class="ph ph-chart-line"></i> <span>Reports</span></a>
+            <a href="overview.php" class="flex items-center gap-2 px-4 py-3 hover:bg-gray-700"><i class="ph ph-eye"></i> <span>Overview</span></a>
+            <a href="feeding_system.php" class="flex items-center gap-2 px-4 py-3 hover:bg-gray-700 bg-gray-700"><i class="ph ph-fork-knife"></i> <span>Feeding System</span></a>
+            <a href="user_management.php" class="flex items-center gap-2 px-4 py-3 hover:bg-gray-700"><i class="ph ph-users"></i> <span>User Management</span></a>
+            <a href="logout.php" class="flex items-center gap-2 px-4 py-3 text-red-400 hover:bg-red-600 hover:text-white"><i class="ph ph-sign-out"></i> <span>Logout</span></a>
         </nav>
     </div>
-    
-<body class="bg-gray-100">
-    <!-- Display Feeding Records -->
-<div class="bg-white shadow-md rounded-lg p-6 mt-6">
-    <h3 class="text-xl font-bold text-gray-700 mb-4">Feeding Records</h3>
-    <table class="w-full border-collapse border border-gray-300">
-        <thead>
-            <tr class="bg-gray-200">
-                <th class="border border-gray-300 p-2">Feed Type</th>
-                <th class="border border-gray-300 p-2">Quantity (kg)</th>
-                <th class="border border-gray-300 p-2">Feeding Time</th>
-                <th class="border border-gray-300 p-2">Actions</th>
-            </tr>
-        </thead>
-        <tbody>
-            <?php 
-            $result = $conn->query("SELECT * FROM feeding_records ORDER BY feeding_time DESC");
-            while ($row = $result->fetch_assoc()) { ?>
-                <tr>
-                    <td class="border border-gray-300 p-2"><?= htmlspecialchars($row['feed_type']); ?></td>
-                    <td class="border border-gray-300 p-2"><?= htmlspecialchars($row['quantity']); ?></td>
-                    <td class="border border-gray-300 p-2"><?= htmlspecialchars($row['feeding_time']); ?></td>
-                    <td class="border border-gray-300 p-2">
-                        <a href="edit_feeding.php?id=<?= $row['id']; ?>" class="text-blue-500">Edit</a> |
-                        <a href="delete_feeding.php?id=<?= $row['id']; ?>" class="text-red-500" onclick="return confirm('Are you sure you want to delete this record?');">Delete</a>
-                    </td>
-                </tr>
-            <?php } ?>
-        </tbody>
-    </table>
-</div>
 
-<!-- Display Feeding Schedule -->
-<div class="bg-white shadow-md rounded-lg p-6 mt-6">
-    <h3 class="text-xl font-bold text-gray-700 mb-4">Feeding Schedule</h3>
-    <table class="w-full border-collapse border border-gray-300">
-        <thead>
-            <tr class="bg-gray-200">
-                <th class="border border-gray-300 p-2">Time of Day</th>
-                <th class="border border-gray-300 p-2">Food Type</th>
-                <th class="border border-gray-300 p-2">Feeding Time</th>
-                <th class="border border-gray-300 p-2">Quantity (kg)</th>
-                <th class="border border-gray-300 p-2">Actions</th>
-            </tr>
-        </thead>
-        <tbody>
-            <?php 
-            $schedule_result = $conn->query("SELECT * FROM feeding_schedule ORDER BY feeding_time ASC");
-            while ($row = $schedule_result->fetch_assoc()) { ?>
-                <tr>
-                    <td class="border border-gray-300 p-2"><?= htmlspecialchars($row['time_of_day']); ?></td>
-                    <td class="border border-gray-300 p-2"><?= htmlspecialchars($row['food_type']); ?></td>
-                    <td class="border border-gray-300 p-2"><?= htmlspecialchars($row['feeding_time']); ?></td>
-                    <td class="border border-gray-300 p-2"><?= htmlspecialchars($row['quantity']); ?></td>
-                    <td class="border border-gray-300 p-2">
-                        <a href="edit_schedule.php?id=<?= $row['id']; ?>" class="text-blue-500">Edit</a> |
-                        <a href="delete_schedule.php?id=<?= $row['id']; ?>" class="text-red-500" onclick="return confirm('Are you sure you want to delete this schedule?');">Delete</a>
-                    </td>
-                </tr>
-            <?php } ?>
-        </tbody>
-    </table>
-</div>
+    <!-- Main Content -->
+    <div class="main-content lg:ml-64 p-6 transition-all duration-300">
+        <div class="topbar bg-white shadow p-4 rounded-lg flex justify-between items-center">
+            <button id="openSidebar" class="lg:hidden text-gray-700"><i class="ph ph-list text-2xl"></i></button>
+            <h2 class="text-3xl font-bold text-gray-800">Feeding Management</h2>
+        </div>
 
-<div class="main-content ml-64 p-6">
-<div class="topbar bg-white shadow p-4 rounded-lg flex justify-between items-center">
-    <div class="main-content p-6">
-        <h2 class="text-3xl font-bold text-gray-800 mb-4">Feeding Management</h2>
-
-        <!-- Success and Error Messages -->
+        <!-- Messages -->
         <?php if (isset($_SESSION['success_message'])) { ?>
-            <p class="bg-green-500 text-white p-2 rounded"> <?= $_SESSION['success_message']; unset($_SESSION['success_message']); ?> </p>
+            <p class="bg-green-500 text-white p-2 rounded mt-4"><?= $_SESSION['success_message'];
+                                                                unset($_SESSION['success_message']); ?></p>
         <?php } ?>
-        
         <?php if (isset($_SESSION['error_message'])) { ?>
-            <p class="bg-red-500 text-white p-2 rounded"> <?= $_SESSION['error_message']; unset($_SESSION['error_message']); ?> </p>
+            <p class="bg-red-500 text-white p-2 rounded mt-4"><?= $_SESSION['error_message'];
+                                                                unset($_SESSION['error_message']); ?></p>
         <?php } ?>
+
+        <!-- Feeding Records -->
+        <div class="bg-white shadow-md rounded-lg p-6 mt-6">
+            <h3 class="text-xl font-bold text-gray-700 mb-4">Feeding Records</h3>
+            <table class="w-full border-collapse border border-gray-300">
+                <thead>
+                    <tr class="bg-gray-200">
+                        <th class="border border-gray-300 p-2">Feed Type</th>
+                        <th class="border border-gray-300 p-2">Quantity (kg)</th>
+                        <th class="border border-gray-300 p-2">Feeding Time</th>
+                        <th class="border border-gray-300 p-2">Actions</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <?php
+                    $result = $conn->query("SELECT * FROM feeding_records ORDER BY feeding_time DESC");
+                    while ($row = $result->fetch_assoc()) { ?>
+                        <tr>
+                            <td class="border border-gray-300 p-2"><?= htmlspecialchars($row['feed_type']); ?></td>
+                            <td class="border border-gray-300 p-2"><?= htmlspecialchars($row['quantity']); ?></td>
+                            <td class="border border-gray-300 p-2"><?= htmlspecialchars($row['feeding_time']); ?></td>
+                            <td class="border border-gray-300 p-2">
+                                <a href="edit_feeding.php?id=<?= $row['id']; ?>" class="text-blue-500">Edit</a> |
+                                <a href="delete_feeding.php?id=<?= $row['id']; ?>" class="text-red-500" onclick="return confirm('Are you sure you want to delete this record?');">Delete</a>
+                            </td>
+                        </tr>
+                    <?php } ?>
+                </tbody>
+            </table>
+        </div>
+
+        <!-- Feeding Schedule -->
+        <div class="bg-white shadow-md rounded-lg p-6 mt-6">
+            <h3 class="text-xl font-bold text-gray-700 mb-4">Feeding Schedule</h3>
+            <table class="w-full border-collapse border border-gray-300">
+                <thead>
+                    <tr class="bg-gray-200">
+                        <th class="border border-gray-300 p-2">Time of Day</th>
+                        <th class="border border-gray-300 p-2">Food Type</th>
+                        <th class="border border-gray-300 p-2">Feeding Time</th>
+                        <th class="border border-gray-300 p-2">Quantity (kg)</th>
+                        <th class="border border-gray-300 p-2">Actions</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <?php
+                    $schedule_result = $conn->query("SELECT * FROM feeding_schedule ORDER BY feeding_time ASC");
+                    while ($row = $schedule_result->fetch_assoc()) { ?>
+                        <tr>
+                            <td class="border border-gray-300 p-2"><?= htmlspecialchars($row['time_of_day']); ?></td>
+                            <td class="border border-gray-300 p-2"><?= htmlspecialchars($row['food_type']); ?></td>
+                            <td class="border border-gray-300 p-2"><?= htmlspecialchars($row['feeding_time']); ?></td>
+                            <td class="border border-gray-300 p-2"><?= htmlspecialchars($row['quantity']); ?></td>
+                            <td class="border border-gray-300 p-2">
+                                <a href="edit_schedule.php?id=<?= $row['id']; ?>" class="text-blue-500">Edit</a> |
+                                <a href="delete_schedule.php?id=<?= $row['id']; ?>" class="text-red-500" onclick="return confirm('Are you sure you want to delete this schedule?');">Delete</a>
+                            </td>
+                        </tr>
+                    <?php } ?>
+                </tbody>
+            </table>
+        </div>
 
         <!-- Add Feeding Record Form -->
-        <div class="bg-white shadow-md rounded-lg p-4 mb-6">
+        <div class="bg-white shadow-md rounded-lg p-6 mt-6">
             <h3 class="text-xl font-bold text-gray-700 mb-4">Add Feeding Record</h3>
             <form method="POST" action="">
                 <input type="hidden" name="add_feeding_record">
-                <div class="grid grid-cols-2 gap-4">
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
                     <input type="text" name="feed_type" placeholder="Feed Type" class="border p-2 rounded" required>
                     <input type="number" step="0.01" name="quantity" placeholder="Quantity (kg)" class="border p-2 rounded" required>
                     <input type="datetime-local" name="feeding_time" class="border p-2 rounded" required>
@@ -241,6 +228,26 @@ if ($_SERVER["REQUEST_METHOD"] == "POST" && isset($_POST['set_feeding_schedule']
             </form>
         </div>
     </div>
-    
+
+    <!-- Sidebar Toggle Script -->
+    <script>
+        const sidebar = document.getElementById("sidebar");
+        const toggleSidebar = document.getElementById("toggleSidebar");
+        const openSidebar = document.getElementById("openSidebar");
+
+        if (toggleSidebar) {
+            toggleSidebar.addEventListener("click", () => {
+                sidebar.classList.toggle("-translate-x-64");
+            });
+        }
+
+        if (openSidebar) {
+            openSidebar.addEventListener("click", () => {
+                sidebar.classList.toggle("-translate-x-64");
+            });
+        }
+    </script>
+
 </body>
+
 </html>
